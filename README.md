@@ -33,10 +33,10 @@ uv run weather.py Hamburg
 uv run weather.py Berlin
 ```
 
-Das Skript gibt die aktuelle Temperatur und Windgeschwindigkeit für den gewählten Ort aus.
+Das Skript gibt die aktuelle Temperatur, Luftfeuchtigkeit, Windgeschwindigkeit und eine Vorhersage für heute aus.
 
 ## Zukünftige Funktionen
 
 - [x] Unterstützung für verschiedene Städte über Kommandozeilenparameter.
-- [ ] Anzeige von Luftfeuchtigkeit und Wettervorhersage.
+- [x] Anzeige von Luftfeuchtigkeit und Wettervorhersage.
 - [ ] Integration einer interaktiven Benutzeroberfläche.
