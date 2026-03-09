@@ -23,12 +23,10 @@ def get_coordinates(city_name: str):
         else:
             return None
     except Exception as e:
-        print(f"Fehler bei der Geocoding-Abfrage: {e}", file=sys.stderr)
-        return None
+        return {"error": f"Fehler bei der Geocoding-Abfrage: {e}"}
 
-def get_weather(lat: float, lon: float, city_display_name: str):
+def get_weather_data(lat: float, lon: float):
     """Ruft die Wetterdaten für die gegebenen Koordinaten ab."""
-    # Wir fragen aktuelle Daten (Temp, Feuchtigkeit, Wind) und die Vorhersage für heute ab
     url = (
         f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
         "&current=temperature_2m,relative_humidity_2m,wind_speed_10m"
@@ -41,27 +39,19 @@ def get_weather(lat: float, lon: float, city_display_name: str):
         response.raise_for_status()
         data = response.json()
         
-        # Aktuelles Wetter
         current = data["current"]
-        temp = current["temperature_2m"]
-        humidity = current["relative_humidity_2m"]
-        windspeed = current["wind_speed_10m"]
-        
-        # Vorhersage für heute (Index 0)
         daily = data["daily"]
-        temp_max = daily["temperature_2m_max"][0]
-        temp_min = daily["temperature_2m_min"][0]
         
-        print(f"--- Wetter in {city_display_name} ---")
-        print(f"Aktuell: {temp}°C")
-        print(f"Luftfeuchtigkeit: {humidity}%")
-        print(f"Windgeschwindigkeit: {windspeed} km/h")
-        print(f"Vorhersage heute: Max {temp_max}°C, Min {temp_min}°C")
-        
-    except httpx.HTTPStatusError as e:
-        print(f"Fehler beim Abrufen der Wetterdaten von Open-Meteo: {e}", file=sys.stderr)
+        return {
+            "temp": current["temperature_2m"],
+            "humidity": current["relative_humidity_2m"],
+            "windspeed": current["wind_speed_10m"],
+            "temp_max": daily["temperature_2m_max"][0],
+            "temp_min": daily["temperature_2m_min"][0],
+            "weather_code": daily["weather_code"][0]
+        }
     except Exception as e:
-        print(f"Ein unerwarteter Fehler ist aufgetreten: {e}", file=sys.stderr)
+        return {"error": str(e)}
 
 def main():
     parser = argparse.ArgumentParser(description="Wetter-App: Aktuelle Wetterdaten und Vorhersage abrufen.")
@@ -71,11 +61,20 @@ def main():
     
     location = get_coordinates(args.city)
     
-    if location:
-        display_name = f"{location['name']} ({location['country']})"
-        get_weather(location['lat'], location['lon'], display_name)
+    if location and "error" not in location:
+        data = get_weather_data(location['lat'], location['lon'])
+        if "error" not in data:
+            display_name = f"{location['name']} ({location['country']})"
+            print(f"--- Wetter in {display_name} ---")
+            print(f"Aktuell: {data['temp']}°C")
+            print(f"Luftfeuchtigkeit: {data['humidity']}%")
+            print(f"Windgeschwindigkeit: {data['windspeed']} km/h")
+            print(f"Vorhersage heute: Max {data['temp_max']}°C, Min {data['temp_min']}°C")
+        else:
+            print(f"Fehler beim Abrufen der Wetterdaten: {data['error']}", file=sys.stderr)
     else:
-        print(f"Konnte keine Koordinaten für '{args.city}' finden.", file=sys.stderr)
+        error_msg = location["error"] if location and "error" in location else f"Konnte keine Koordinaten für '{args.city}' finden."
+        print(error_msg, file=sys.stderr)
         sys.exit(1)
 
 if __name__ == "__main__":

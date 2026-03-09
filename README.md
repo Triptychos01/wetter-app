@@ -22,7 +22,8 @@ Ein einfaches Python-Skript, um das aktuelle Wetter für Geesthacht abzurufen. N
 
 ## Nutzung
 
-Führe das Skript einfach mit `uv` aus. Du kannst optional einen Städtenamen angeben (Standard ist Geesthacht):
+### CLI-Version
+Führe das Skript mit `uv` aus. Du kannst optional einen Städtenamen angeben:
 
 ```bash
 # Standard: Geesthacht
@@ -30,13 +31,17 @@ uv run weather.py
 
 # Beliebiger Ort:
 uv run weather.py Hamburg
-uv run weather.py Berlin
 ```
 
-Das Skript gibt die aktuelle Temperatur, Luftfeuchtigkeit, Windgeschwindigkeit und eine Vorhersage für heute aus.
+### Web-App (Interaktive Oberfläche)
+Du kannst die Wetter-App auch mit einer grafischen Oberfläche im Browser starten:
+
+```bash
+uv run streamlit run app.py
+```
 
 ## Zukünftige Funktionen
 
 - [x] Unterstützung für verschiedene Städte über Kommandozeilenparameter.
 - [x] Anzeige von Luftfeuchtigkeit und Wettervorhersage.
-- [ ] Integration einer interaktiven Benutzeroberfläche.
+- [x] Integration einer interaktiven Benutzeroberfläche (Streamlit).
