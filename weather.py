@@ -32,8 +32,10 @@ def get_weather_data(lat: float, lon: float):
     url = (
         f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
         "&current=temperature_2m,relative_humidity_2m,wind_speed_10m"
+        "&hourly=temperature_2m"
         "&daily=temperature_2m_max,temperature_2m_min,weather_code"
         "&timezone=auto"
+        "&forecast_days=7"
     )
 
     try:
@@ -43,6 +45,18 @@ def get_weather_data(lat: float, lon: float):
 
         current = data["current"]
         daily = data["daily"]
+        hourly = data["hourly"]
+
+        # Aktuelle Stunde finden und nächste 24 Stunden extrahieren
+        current_time = datetime.fromisoformat(current["time"])
+        hourly_times = [datetime.fromisoformat(t) for t in hourly["time"]]
+        start_idx = next(
+            (i for i, t in enumerate(hourly_times) if t >= current_time), 0
+        )
+        hourly_24 = {
+            "time": [t.strftime("%H:%M") for t in hourly_times[start_idx:start_idx + 24]],
+            "temp": hourly["temperature_2m"][start_idx:start_idx + 24],
+        }
 
         return {
             "temp": current["temperature_2m"],
@@ -51,6 +65,7 @@ def get_weather_data(lat: float, lon: float):
             "temp_max": daily["temperature_2m_max"][0],
             "temp_min": daily["temperature_2m_min"][0],
             "weather_code": daily["weather_code"][0],
+            "hourly_24": hourly_24,
             "daily": {
                 "time": daily["time"],
                 "temp_max": daily["temperature_2m_max"],
@@ -60,6 +75,21 @@ def get_weather_data(lat: float, lon: float):
         }
     except Exception as e:
         return {"error": str(e)}
+
+
+def get_air_quality(lat: float, lon: float):
+    """Ruft den aktuellen europäischen Luftqualitätsindex (AQI) ab."""
+    url = (
+        f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}"
+        "&current=european_aqi"
+    )
+    try:
+        response = httpx.get(url, timeout=10.0)
+        response.raise_for_status()
+        data = response.json()
+        return data["current"]["european_aqi"]
+    except Exception:
+        return None
 
 
 def main():
