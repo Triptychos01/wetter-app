@@ -74,7 +74,7 @@ if city_input:
 
                 # Karte anzeigen (helles Farbschema)
                 st.pydeck_chart(pdk.Deck(
-                    map_style="mapbox://styles/mapbox/light-v10",
+                    map_style="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
                     initial_view_state=pdk.ViewState(
                         latitude=location["lat"],
                         longitude=location["lon"],

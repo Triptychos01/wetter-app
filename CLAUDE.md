@@ -22,9 +22,23 @@ uv run python -m streamlit run app.py
 
 Das Projekt hat zwei Nutzungsebenen über denselben Backend-Code:
 
-- **`weather.py`** — Kernlogik. Enthält `get_coordinates()` (Geocoding via Open-Meteo), `get_weather_data()` (Wetter + 7-Tage-Vorhersage via Open-Meteo) sowie eine `main()`-Funktion für den CLI-Betrieb mit `argparse`.
-- **`app.py`** — Streamlit-Frontend. Importiert die beiden Funktionen aus `weather.py` und stellt sie als interaktive Web-Oberfläche dar (Stadteingabe, Metriken, Vorhersage-Tabelle, Karte).
+- **`weather.py`** — Kernlogik mit drei Funktionen:
+  - `get_coordinates(city_name)` — Geocoding via Open-Meteo
+  - `get_weather_data(lat, lon)` — Aktuelles Wetter, stündliche Temperaturen (nächste 24h) und 7-Tage-Vorhersage via Open-Meteo
+  - `get_air_quality(lat, lon)` — Europäischer Luftqualitätsindex (LQI) via Open-Meteo Air Quality API
+  - `main()` — CLI-Betrieb mit `argparse`
 
-Alle Wetterdaten kommen von der kostenlosen [Open-Meteo API](https://open-meteo.com/) — kein API-Key erforderlich. HTTP-Requests laufen über `httpx`.
+- **`app.py`** — Streamlit-Frontend mit: Stadteingabe, Aktualisieren-Button, 4 Metriken (Temperatur, Luftfeuchtigkeit, Wind, LQI mit Kategorie-Label), 24h-Temperaturliniendiagramm, 7-Tage-Vorhersage-Tabelle (ohne Index), Karte im Light-Mode via pydeck.
+
+Alle Daten kommen von der kostenlosen [Open-Meteo API](https://open-meteo.com/) — kein API-Key erforderlich. HTTP-Requests laufen über `httpx`.
+
+### LQI-Kategorien
+
+| Wert    | Kategorie                        |
+|---------|----------------------------------|
+| 0–50    | gut                              |
+| 51–100  | mäßig                            |
+| 101–150 | ungesund für sensible Gruppen    |
+| 151–200 | ungesund                         |
 
 `main.py` ist ein uv-generierter Platzhalter und gehört nicht zur App-Logik.
