@@ -28,7 +28,7 @@ Das Projekt hat zwei Nutzungsebenen über denselben Backend-Code:
   - `get_air_quality(lat, lon)` — Europäischer Luftqualitätsindex (LQI) via Open-Meteo Air Quality API
   - `main()` — CLI-Betrieb mit `argparse`
 
-- **`app.py`** — Streamlit-Frontend mit: Stadteingabe, Aktualisieren-Button, 4 Metriken (Temperatur, Luftfeuchtigkeit, Wind, LQI mit Kategorie-Label), 24h-Temperaturliniendiagramm, 7-Tage-Vorhersage-Tabelle (ohne Index), Karte im Light-Mode via pydeck.
+- **`app.py`** — Streamlit-Frontend mit: Stadteingabe, Aktualisieren-Button (`st.cache_data.clear()`), 4 Metriken (Temperatur, Luftfeuchtigkeit, Wind, LQI mit Kategorie-Label), 24h-Temperaturliniendiagramm (`st.line_chart`), 7-Tage-Vorhersage-Tabelle (`st.dataframe`, ohne Index), Karte via `st.pydeck_chart` mit CARTO Voyager-Stil.
 
 Alle Daten kommen von der kostenlosen [Open-Meteo API](https://open-meteo.com/) — kein API-Key erforderlich. HTTP-Requests laufen über `httpx`.
 
@@ -40,5 +40,9 @@ Alle Daten kommen von der kostenlosen [Open-Meteo API](https://open-meteo.com/) 
 | 51–100  | mäßig                            |
 | 101–150 | ungesund für sensible Gruppen    |
 | 151–200 | ungesund                         |
+
+### Bekannte Einschränkung: Streamlit Cloud
+
+Open-Meteo drosselt Anfragen von Streamlit-Cloud-IPs (429-Fehler), da alle dort gehosteten Apps dieselben IP-Adressen teilen. Die App funktioniert lokal einwandfrei. Für einen Cloud-Deploy wäre ein Wechsel zu einem Anbieter mit individuellen API-Keys (z. B. OpenWeatherMap) nötig.
 
 `main.py` ist ein uv-generierter Platzhalter und gehört nicht zur App-Logik.
